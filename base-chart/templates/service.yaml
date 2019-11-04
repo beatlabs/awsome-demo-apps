@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "base-chart.fullname" . }}
+  annotations: {{ if and (not .Values.blackboxProbe.enabled) (not .Values.mop.enabled) -}}{}{{- end }}
+    {{ if .Values.blackboxProbe.enabled -}}
+    prometheus.io/probe: "true"
+    prometheus.io/probe_path: {{ .Values.blackboxProbe.path }}
+    prometheus.io/probe_for: {{ .Values.blackboxProbe.for }}
+    prometheus.io/probe_severity: {{ .Values.blackboxProbe.severity }}
+    {{- end }}
+    {{ if .Values.mop.enabled -}}
+    {{ .Values.mop.annotation }}: "true"
+    {{- end }}
+  labels:
+    app.kubernetes.io/name: {{ include "base-chart.name" . }}
+    helm.sh/chart: {{ include "base-chart.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "base-chart.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

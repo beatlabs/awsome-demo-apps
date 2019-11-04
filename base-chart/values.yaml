@@ -1,0 +1,89 @@
+replicaCount: 1
+
+image:
+  registry: commixon/
+  name: awsome-demo-app
+  tag: v1
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+
+env: {}
+  # ENV_VAR1: envVar2
+  # ENV_VAR2: envVar2
+
+ingress:
+  enabled: true
+  # type can be either public or private
+  type: private
+  annotations: {}
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  host: example
+  clusterSuffix: k8s.tatooine.thebeat.co
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 200m
+  #  memory: 256Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+monitoring:
+  enabled: false
+  path: /health
+  port: 8081
+
+# This will enable blackbox exporter probes in the designated path.
+# If the probe gets non 2xx responses for more than "for:" period it will send an alert to the alertmanager
+# Alertmanager will route the notification according to severity to a slack channel or pagerduty
+blackboxProbe:
+  enabled: false
+  path: /health
+  for: 5m
+  severity: warning
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+autoscaling:
+  enabled: false
+  # minReplicas: 3
+  # maxReplicas: 10
+  # metrics:
+  # - type: Resource
+  #   resource:
+  #     name: cpu
+  #     targetAverageUtilization: 80
+  # - type: Resource
+  #   resource:
+  #     name: memory
+  #     targetAverageUtilization: 80
+
+nodeSelector: {}
+# enable the following if your app is stateless and comment out the above line
+# nodeSelector:
+  # is.spot.instance: "true"
+
+tolerations: []
+# enable the following if your app is stateless and comment out the above line
+# tolerations:
+#   - key: "instancetype"
+#     operator: "Equal"
+#     value: "spot"
+#     effect: "NoSchedule"
+
