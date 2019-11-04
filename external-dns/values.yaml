@@ -1,0 +1,46 @@
+image:
+  name: registry.opensource.zalan.do/teapot/external-dns
+  tag: v0.5.9
+
+# When enabled, prints DNS record changes rather than actually performing them
+dryRun: false
+# The interval between two consecutive synchronizations in duration format
+# Default is 1m but we have to ispect this for quota limits
+interval: 1m
+
+# Registry method to use (options: txt, noop)
+registry: txt
+
+# This controls which types of resource external-dns should 'watch' for new
+# DNS entries.
+# We could also add '- ingress', but we already have a mechanism for that
+sources:
+  - service
+
+# Annotations to be added to pods
+podAnnotations:
+    iam.amazonaws.com/role: external-dns.workshop.thebeat.co
+
+# --set deployment.podAnnotations."iam\.amazonaws\.com/role"=k8s-${STACK_NAME}-TraefikIAMRole,dashboard.domain=traefik.private.k8s.${CLUSTER_NAME},service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-ssl-cert"=${K8S_PRIVATE_ACM_CERT_ARN}
+# Allow external-dns to publish DNS records for ClusterIP services (optional)
+# We disable this for now but could be useful in the future
+publishInternalServices: false
+
+## The DNS provider where the DNS records will be created (options: aws, google, inmemory, azure, rfc2136 )
+provider: aws
+
+## Modify how DNS records are sychronized between sources and providers (options: sync, upsert-only )
+policy: sync
+
+rbac:
+  ## If true, create & use RBAC resources
+  ##
+  create: true
+  # Beginning with Kubernetes 1.8, the api is stable and v1 can be used.
+  apiVersion: v1beta1
+
+  ## Ignored if rbac.create is true
+  ##
+  serviceAccountName: default
+
+zoneIdFilters: []
