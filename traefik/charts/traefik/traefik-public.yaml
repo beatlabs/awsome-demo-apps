@@ -1,0 +1,67 @@
+## Default values for Traefik
+image: traefik
+imageTag: 1.7.14
+## can switch the service type to NodePort if required
+serviceType: LoadBalancer
+
+externalTrafficPolicy: Cluster
+replicas: 3
+
+debug:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 100Mi
+  limits:
+    cpu: 200m
+    memory: 300Mi
+
+autoscaling:
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 75
+  - type: Resource
+    resource:
+      name: memory
+      targetAverageUtilization: 75
+
+kubernetes:
+  ingressClass: traefik-public
+
+service:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+
+dashboard:
+  enabled: false
+  service:
+    annotations:
+      kubernetes.io/ingress.class: traefik-private
+  # auth:
+  #   basic:
+  #     admin: $apr1$wlku2sBV$UOdyYivQ1EE.ORHV7ZNcj1
+
+metrics:
+  prometheus:
+    enabled: true
+
+rbac:
+  enabled: true
+
+ssl:
+  enabled: true
+  enforced: true
+  upstream: true
+  insecureSkipVerify: false
+
+deployment:
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"

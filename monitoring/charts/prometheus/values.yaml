@@ -1,0 +1,111 @@
+rbac:
+  create: true
+
+alertmanager:
+  ## If false, alertmanager will not be installed
+  ##
+  enabled: true
+  ingress:
+    ## If true, alertmanager Ingress will be created
+    ##
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: traefik-private
+    hosts:
+      - alertmanager.private.k8s.tatooine.thebeat.co
+
+
+kubeStateMetrics:
+  ## If false, kube-state-metrics will not be installed
+  ##
+  enabled: true
+
+  ## kube-state-metrics container name
+  ##
+  name: kube-state-metrics
+
+nodeExporter:
+  ## If false, node-exporter will not be installed
+  ##
+  enabled: true
+
+server:
+  ## Prometheus server container name
+  ##
+  enabled: true
+  name: server
+  sidecarContainers:
+
+  ## Prometheus server container image
+  ##
+  image:
+    repository: prom/prometheus
+    tag: v2.13.1
+    pullPolicy: IfNotPresent
+
+  ## prometheus server priorityClassName
+  ##
+  priorityClassName: ""
+
+  ## The URL prefix at which the container can be accessed. Useful in the case the '-web.external-url' includes a slug
+  ## so that the various internal URLs are still able to access as they are in the default case.
+  ## (Optional)
+  prefixURL: ""
+
+  ## External URL which can access alertmanager
+  ## Maybe same with Ingress host name
+  baseURL: ""
+
+  ## Path to a configuration file on prometheus server container FS
+  configPath: /etc/config/prometheus.yml
+
+  ingress:
+    ## If true, Prometheus server Ingress will be created
+    ##
+    enabled: true
+
+    ## Prometheus server Ingress annotations
+    ##
+    annotations:
+      kubernetes.io/ingress.class: traefik-private
+
+    ## Prometheus server Ingress additional labels
+    ##
+    extraLabels: {}
+
+    ## Prometheus server Ingress hostnames with optional path
+    ## Must be provided if Ingress is enabled
+    ##
+    hosts:
+      - prometheus.private.k8s.tatooine.thebeat.co
+
+pushgateway:
+  ## If false, pushgateway will not be installed
+  ##
+  enabled: true
+
+  name: pushgateway
+
+  ## pushgateway container image
+  ##
+  image:
+    repository: prom/pushgateway
+    tag: v0.8.0
+    pullPolicy: IfNotPresent
+
+  ingress:
+    ## If true, pushgateway Ingress will be created
+    ##
+    enabled: true
+
+    ## pushgateway Ingress annotations
+    ##
+    annotations:
+      kubernetes.io/ingress.class: traefik-private
+
+    ## pushgateway Ingress hostnames with optional path
+    ## Must be provided if Ingress is enabled
+    ##
+    hosts:
+      - pushgateway.private.k8s.tatooine.thebeat.co
+
